@@ -6,6 +6,7 @@ import enchant
 import time
 import urllib3
 import certifi
+import logging
 
 http = urllib3.PoolManager(
     cert_reqs='CERT_REQUIRED',  # Force certificate check.
@@ -14,6 +15,8 @@ http = urllib3.PoolManager(
 
 en_dict = enchant.Dict('en')
 alphabet = set([i for i in 'abcdefghijklmnopqrstuvwxyz'])
+
+logging.basicConfig(filename='Fin2FarBotLog.log', level=logging.INFO)
 
 
 def transliterate(text):
@@ -49,7 +52,7 @@ def listener(messages):
         chatid = m.chat.id
         if m.content_type == 'text' and is_finglish(m.text.lower()):
             print("[%s] %s %s (%s), %s: %s" %(time.ctime(), m.from_user.first_name, m.from_user.last_name, m.from_user.username, chatid, m.text))
-            log.write("[%s] %s %s (%s), %s: %s\n" %(time.ctime(), m.from_user.first_name, m.from_user.last_name, m.from_user.username, chatid, m.text))
+            logging.info("[%s] %s %s (%s), %s: %s\n" %(time.ctime(), m.from_user.first_name, m.from_user.last_name, m.from_user.username, chatid, m.text))
             bot.reply_to(
                 m,
                 transliterate(m.text)
