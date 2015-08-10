@@ -5,6 +5,7 @@ import requests
 import enchant
 import time
 
+print(dir(requests))
 
 en_dict = enchant.Dict('en')
 alphabet = set([i for i in 'abcdefghijklmnopqrstuvwxyz'])
