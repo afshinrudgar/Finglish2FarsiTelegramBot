@@ -4,26 +4,33 @@ import telebot
 import requests
 import enchant
 import time
+import urllib3
+import certifi
 
-print(dir(requests))
+http = urllib3.PoolManager(
+    cert_reqs='CERT_REQUIRED',  # Force certificate check.
+    ca_certs=certifi.where(),  # Path to the Certifi bundle.
+)
 
 en_dict = enchant.Dict('en')
 alphabet = set([i for i in 'abcdefghijklmnopqrstuvwxyz'])
+
 
 def transliterate(text):
     url = 'http://www.behnevis.com/php/convert.php'
     headers = {'Accept-Charset': 'UTF-8'}
 
-    r = requests.post(
+    r = http.request(
+        'POST',
         url,  # + 'farsi=salam&responsetime=-1&resulttype=json',
-        data={
+        fields={
             'farsi': text,
             'responsetime': -1
         },
         headers=headers
     )
 
-    return r.text
+    return r.data
 
 
 def is_finglish(text):
@@ -40,14 +47,16 @@ def listener(messages):
     """
     for m in messages:
         chatid = m.chat.id
-        if m.content_type == 'text' and is_finglish(m.text):
-            print("[%s] %s, %s" %(time.ctime(), chatid, m.text))
+        if m.content_type == 'text' and is_finglish(m.text.lower()):
+            print("[%s] %s %s (%s), %s: %s" %(time.ctime(), m.from_user.first_name, m.from_user.last_name, m.from_user.username, chatid, m.text))
+            log.write("[%s] %s %s (%s), %s: %s\n" %(time.ctime(), m.from_user.first_name, m.from_user.last_name, m.from_user.username, chatid, m.text))
             bot.reply_to(
                 m,
                 transliterate(m.text)
             )
 
 
+log = open('Fin2FarBotLog.log', 'w')
 bot = telebot.TeleBot('122159953:AAGAxAZhIRki8J0vEKd8II9zQCqXV0UV67M')
 bot.set_update_listener(listener)
 bot.polling()
