@@ -1,4 +1,4 @@
-certifi==2015.4.28
+certifi==2022.12.7
 futures==3.0.3
 goslate==1.4.0
 py==1.4.30
